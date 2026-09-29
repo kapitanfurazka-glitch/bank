@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Игробанк</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --g1:#21a038; --g2:#0b7a3c; --bg:#eef3ef; --ink:#13231a; --mut:#66796c; --card:#fff; --line:#e0e9e2; --red:#d24a4a; --soft:#e8f5ec;
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){ --bg:#0e1611; --ink:#e9f2ec; --mut:#8aa091; --card:#16211a; --line:#24342a; --soft:#183424; } }
+  :root[data-theme="dark"]{ --bg:#0e1611; --ink:#e9f2ec; --mut:#8aa091; --card:#16211a; --line:#24342a; --soft:#183424; }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  body{ background:var(--bg); color:var(--ink); font-family:'Manrope',system-ui,sans-serif; -webkit-tap-highlight-color:transparent; }
+  button{ font-family:inherit; cursor:pointer; }
+  .wrap{ max-width:480px; margin:0 auto; min-height:100vh; position:relative; padding-bottom:84px; }
+
+  .hero{ background:linear-gradient(160deg,var(--g1),var(--g2)); color:#fff; padding:44px 24px 70px; text-align:center; }
+  .logo{ width:64px; height:64px; border-radius:50%; background:#fff; color:var(--g1); font-weight:800; font-size:28px; display:flex; align-items:center; justify-content:center; margin:0 auto 14px; }
+  .sheet{ background:var(--card); border-radius:24px 24px 0 0; margin-top:-34px; padding:22px 20px 40px; min-height:60vh; position:relative; }
+  .seg{ display:flex; background:var(--soft); border-radius:12px; padding:4px; margin-bottom:10px; }
+  .seg button{ flex:1; border:0; background:transparent; padding:10px; border-radius:9px; font:700 14px 'Manrope'; color:var(--mut); }
+  .seg button.on{ background:var(--card); color:var(--g2); box-shadow:0 1px 4px rgba(0,0,0,.15); }
+  label{ display:block; font-size:12px; color:var(--mut); margin:14px 0 6px; font-weight:600; }
+  input{ width:100%; padding:14px; border:1.5px solid var(--line); border-radius:12px; font:600 16px 'Manrope'; background:var(--card); color:var(--ink); outline:none; }
+  input:focus{ border-color:var(--g1); }
+  .btn{ width:100%; margin-top:18px; padding:15px; border:0; border-radius:14px; background:var(--g1); color:#fff; font:800 16px 'Manrope'; }
+  .btn:disabled{ opacity:.6; }
+  .err{ color:var(--red); font-size:13px; margin-top:10px; min-height:16px; font-weight:600; }
+  .note{ font-size:11px; color:var(--mut); margin-top:16px; line-height:1.5; text-align:center; }
+  .hint{ font-size:12px; color:var(--g2); margin-top:6px; min-height:16px; font-weight:600; }
+
+  .top{ background:linear-gradient(160deg,var(--g1),var(--g2)); color:#fff; padding:20px 20px 64px; border-radius:0 0 26px 26px; }
+  .hi{ display:flex; justify-content:space-between; align-items:center; font-weight:700; }
+  .outb{ background:rgba(255,255,255,.2); border:0; color:#fff; padding:7px 12px; border-radius:16px; font:700 12px 'Manrope'; }
+  .bank{ margin:-46px 16px 0; background:var(--card); border-radius:20px; padding:20px; box-shadow:0 10px 30px rgba(0,0,0,.14); position:relative; }
+  .bank .lbl{ color:var(--mut); font-size:12px; font-weight:600; }
+  .bank .bal{ font-size:32px; font-weight:800; margin:6px 0; }
+  .bank .num{ color:var(--mut); font-size:12px; }
+  .actions{ display:flex; gap:10px; margin:16px; }
+  .act{ flex:1; background:var(--card); border:0; border-radius:16px; padding:14px 4px; font:700 12px 'Manrope'; color:var(--ink); box-shadow:0 2px 8px rgba(0,0,0,.07); display:flex; flex-direction:column; align-items:center; gap:6px; }
+  .act i{ width:38px; height:38px; border-radius:50%; background:var(--soft); color:var(--g1); display:flex; align-items:center; justify-content:center; font-style:normal; font-size:18px; font-weight:800; }
+  .sec{ padding:0 16px; }
+  .sec h2{ font-size:20px; margin:22px 0 4px; }
+  .sec h3{ font-size:15px; margin:14px 0 10px; }
+  .row{ display:flex; align-items:center; gap:12px; background:var(--card); padding:12px; border-radius:14px; margin-bottom:8px; }
+  .ic{ width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; background:var(--soft); color:var(--g1); flex:0 0 40px; }
+  .ic.out{ background:#fdeeee; color:var(--red); }
+  .row .t{ flex:1; min-width:0; }
+  .row .t b{ display:block; font-size:14px; }
+  .row .t span{ font-size:11px; color:var(--mut); }
+  .amt{ font-weight:800; font-size:14px; white-space:nowrap; }
+  .amt.in{ color:var(--g1); }
+  .nav{ position:fixed; left:0; right:0; bottom:0; background:var(--card); border-top:1px solid var(--line); display:flex; padding:8px 8px calc(8px + env(safe-area-inset-bottom,0px)); max-width:480px; margin:0 auto; }
+  .nav button{ flex:1; border:0; background:none; font:700 12px 'Manrope'; color:var(--mut); padding:8px; }
+  .nav button.on{ color:var(--g1); }
+  .chips{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+  .chip{ background:var(--soft); color:var(--g2); border:0; border-radius:16px; padding:8px 13px; font:700 12px 'Manrope'; }
+  .form{ background:var(--card); border-radius:18px; padding:4px 16px 18px; margin-top:12px; }
+
+  #toast{ position:fixed; left:12px; right:12px; top:calc(12px + env(safe-area-inset-top,0px)); max-width:456px; margin:0 auto; background:var(--ink); color:var(--bg); padding:14px 16px; border-radius:14px; font-weight:700; font-size:14px; transform:translateY(-160%); transition:transform .3s; z-index:50; }
+  #toast.show{ transform:none; }
+  .done{ position:fixed; inset:0; background:var(--card); z-index:60; display:none; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:24px; }
+  .done.show{ display:flex; }
+  .tick{ width:84px; height:84px; border-radius:50%; background:var(--g1); display:flex; align-items:center; justify-content:center; animation:pop .4s; }
+  @keyframes pop{ from{ transform:scale(.3); opacity:0; } to{ transform:none; opacity:1; } }
+  @keyframes ring{ 0%{ box-shadow:0 0 0 0 rgba(33,160,56,.5); } 100%{ box-shadow:0 0 0 34px rgba(33,160,56,0); } }
+  @keyframes up{ from{ transform:translateY(8px); opacity:0; } to{ transform:none; opacity:1; } }
+  .tick{ animation:pop .4s, ring 1.4s .3s 2 ease-out; }
+  .row{ animation:up .3s; }
+  .av{ width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:15px; flex:0 0 40px; }
+  .bank{ background:linear-gradient(135deg,#0f8f43,#08663f 60%,#064c47); color:#fff; overflow:hidden; }
+  .bank::after{ content:""; position:absolute; right:-46px; top:-46px; width:170px; height:170px; border-radius:50%; background:rgba(255,255,255,.1); }
+  .bank::before{ content:""; position:absolute; right:40px; bottom:-70px; width:140px; height:140px; border-radius:50%; background:rgba(255,255,255,.07); }
+  .bank .lbl,.bank .num{ color:rgba(255,255,255,.8); position:relative; z-index:1; }
+  .bank .bal{ position:relative; z-index:1; }
+  select{ width:100%; padding:14px; border:1.5px solid var(--line); border-radius:12px; font:600 16px 'Manrope'; background:var(--card); color:var(--ink); outline:none; }
+  .bar{ margin-bottom:12px; }
+  .bl{ display:flex; justify-content:space-between; font-size:13px; margin-bottom:5px; }
+  .bt{ height:8px; border-radius:4px; background:var(--soft); }
+  .bt i{ display:block; height:100%; border-radius:4px; background:linear-gradient(90deg,var(--g1),var(--g2)); transition:width .5s; }
+  .shead{ background:linear-gradient(135deg,#5b3df5,#8a3dff 60%,#ff7a2f); color:#fff; padding:22px 18px 26px; border-radius:0 0 26px 26px; display:flex; align-items:center; gap:12px; }
+  .prl{ width:44px; height:44px; border-radius:12px; background:#fff; color:#5b3df5; font-weight:800; display:flex; align-items:center; justify-content:center; }
+  .sht{ flex:1; } .sht b{ display:block; font-size:18px; } .sht span{ font-size:12px; opacity:.85; }
+  .rkb{ display:flex; align-items:center; gap:6px; background:rgba(255,255,255,.2); padding:8px 12px; border-radius:18px; font-size:15px; }
+  .coin{ display:inline-block; width:14px; height:14px; border-radius:50%; background:linear-gradient(135deg,#ffd45a,#ff9a1f); box-shadow:inset 0 0 0 2px rgba(255,255,255,.5); }
+  .lk{ background:var(--card); border-radius:14px; padding:12px 14px; margin-top:16px; display:flex; justify-content:space-between; align-items:center; gap:10px; font-size:13px; font-weight:600; }
+  .lk.ok{ color:var(--g2); background:var(--soft); }
+  .packs{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+  .pk{ background:var(--card); border:1.5px solid var(--line); border-radius:14px; padding:12px 6px; display:flex; flex-direction:column; align-items:center; gap:2px; color:var(--ink); }
+  .pk b{ font-size:16px; } .pk span{ font-size:11px; color:var(--mut); } .pk em{ font-style:normal; font-weight:800; color:#5b3df5; font-size:13px; margin-top:4px; }
+  .chip.on{ background:#5b3df5; color:#fff; }
+  .pgrid{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-top:12px; }
+  .ps{ background:var(--card); border-radius:16px; padding:12px; display:flex; flex-direction:column; gap:4px; }
+  .pi{ width:100%; height:64px; border-radius:12px; color:#fff; font-weight:800; font-size:26px; display:flex; align-items:center; justify-content:center; }
+  .pn{ font-weight:700; font-size:13px; margin-top:6px; } .pc{ font-size:11px; color:var(--mut); }
+  .buy{ margin-top:6px; border:0; border-radius:10px; background:linear-gradient(135deg,#ff8a1f,#ff5f2f); color:#fff; font:800 13px 'Manrope'; padding:9px; display:flex; align-items:center; justify-content:center; gap:6px; }
+  .buy.own{ background:var(--soft); color:var(--g2); }
+  .debt{ background:linear-gradient(135deg,#a83232,#7a1f1f); color:#fff; border-radius:18px; padding:18px; margin-top:12px; }
+  .debt .lbl{ opacity:.85; font-size:12px; } .debt .v{ font-size:26px; font-weight:800; margin:4px 0 12px; }
+  .loffer{ background:var(--card); border:1.5px solid var(--line); border-radius:16px; padding:14px; margin-top:10px; display:flex; justify-content:space-between; align-items:center; gap:10px; }
+  .loffer b{ font-size:17px; display:block; } .loffer span{ font-size:12px; color:var(--mut); }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="toast"></div>
+<div id="done" class="done"></div>
+
+<script>
+(function(){
+  const START=1000000, openedAt=Date.now();
+  let db=null, user=null, canWrite=true, me=localStorage.getItem('igrobank-me')||'', users={}, txs=[], view='home', mode='login', first=true;
+  const tab=Math.random().toString(36).slice(2);
+  const $=s=>document.querySelector(s), app=$('#app');
+  const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const fmt=k=>(k/100).toLocaleString('ru-RU',{minimumFractionDigits:2,maximumFractionDigits:2})+' \u20BD';
+  const bal=l=>txs.reduce((s,t)=>s+(t.to===l?t.kop:0)-(t.from===l?t.kop:0),START);
+  const debt=l=>txs.reduce((s,t)=>s+(t.kind==='loan'&&t.to===l?t.debtKop:0)-(t.kind==='repay'&&t.from===l?t.kop:0),0);
+  const nameOf=l=>l==='bank'?'Банк':(users[l]?users[l].name:l);
+  const tail=l=>String([...l].reduce((s,c)=>s+c.charCodeAt(0)*31,7919)%10000).padStart(4,'0');
+  const when=ts=>new Date(ts).toLocaleString('ru-RU',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+  const mine=()=>txs.filter(t=>t.from===me||t.to===me).slice().reverse();
+  const ini=l=>{ const n=(l==='bank'?'Б':nameOf(l)||'?').trim(); return esc((n[0]||'?').toUpperCase()); };
+  const hue=l=>'hsl('+([...String(l)].reduce((s,c)=>s+c.charCodeAt(0)*17,0)%360)+',55%,46%)';
+
+  async function hash(s){
+    try{ const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s)); return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join(''); }
+    catch(e){ return 'p:'+s; }
+  }
+  let ac;
+  function ding(){
+    try{
+      ac=ac||new (window.AudioContext||window.webkitAudioContext)();
+      [880,1320].forEach((f,i)=>{
+        const o=ac.createOscillator(), g=ac.createGain(), t0=ac.currentTime+i*.12;
+        o.type='sine'; o.frequency.value=f;
+        g.gain.setValueAtTime(.2,t0); g.gain.exponentialRampToValueAtTime(.001,t0+.35);
+        o.connect(g); g.connect(ac.destination); o.start(t0); o.stop(t0+.4);
+      });
+    }catch(e){}
+  }
+  function toast(msg){
+    const t=$('#toast'); t.textContent=msg; t.classList.add('show');
+    clearTimeout(toast.t); toast.t=setTimeout(()=>t.classList.remove('show'),4200);
+  }
+
+  /* ---------- fingerprint (WebAuthn) ---------- */
+  const fpStored=()=>{ try{ return JSON.parse(localStorage.getItem('igrobank-fp')||'null'); }catch(e){ return null; } };
+  const hasFp=l=>{ const f=fpStored(); return !!f&&f.login===l; };
+  const b64=b=>btoa(String.fromCharCode(...new Uint8Array(b)));
+  const unb64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+  function fpBtn(){
+    const f=fpStored();
+    return f&&users[f.login]?'<button class="btn" id="fpin" style="margin:0 0 16px;display:flex;align-items:center;justify-content:center;gap:10px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"><path d="M12 3a7 7 0 0 0-7 7v3"/><path d="M12 7a3 3 0 0 0-3 3v5a5 5 0 0 1-1 3"/><path d="M12 11v4a9 9 0 0 1-2 5"/><path d="M16 10v2a12 12 0 0 1-1.5 6"/><path d="M19 9v3a15 15 0 0 1-1 5"/></svg>Войти по отпечатку: '+esc(nameOf(f.login))+'</button>':'';
+  }
+  async function fpEnable(){
+    const cred=await navigator.credentials.create({publicKey:{
+      challenge:crypto.getRandomValues(new Uint8Array(32)), rp:{name:'Игробанк'},
+      user:{id:new TextEncoder().encode(me),name:me,displayName:nameOf(me)},
+      pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],
+      authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required'}, timeout:60000
+    }});
+    localStorage.setItem('igrobank-fp',JSON.stringify({login:me,id:b64(cred.rawId)}));
+  }
+  async function fpLogin(){
+    const f=fpStored(); if(!f) return;
+    try{
+      await navigator.credentials.get({publicKey:{
+        challenge:crypto.getRandomValues(new Uint8Array(32)),
+        allowCredentials:[{type:'public-key',id:unb64(f.id)}], userVerification:'required', timeout:60000
+      }});
+      me=f.login; localStorage.setItem('igrobank-me',me); showApp('home');
+    }catch(e){ const er=$('#err'); if(er) er.textContent='Отпечаток не подтверждён. Войдите по паролю.'; }
+  }
+
+  /* ---------- auth ---------- */
+  function showAuth(){
+    app.innerHTML='<div class="wrap"><div class="hero"><div class="logo">И</div><h1 style="margin:0;font-size:24px">Игробанк</h1><div style="opacity:.85;font-size:13px;margin-top:6px">Учебный банк с игровыми деньгами</div></div>'+
+      '<div class="sheet">'+fpBtn()+'<div class="seg"><button data-m="login" class="'+(mode==='login'?'on':'')+'">Вход</button><button data-m="reg" class="'+(mode==='reg'?'on':'')+'">Регистрация</button></div>'+
+      (mode==='reg'?'<label>Введите имя</label><input id="nm" maxlength="24" autocomplete="off" placeholder="Как вас зовут">':'')+
+      '<label>Введите логин</label><input id="lg" maxlength="20" autocapitalize="off" autocomplete="off" placeholder="латиницей, например ivan">'+
+      '<label>Пароль</label><input id="pw" type="password" autocomplete="off" placeholder="минимум 4 символа">'+
+      '<div class="err" id="err"></div><button class="btn" id="go">'+(mode==='reg'?'Зарегистрироваться':'Войти')+'</button>'+
+      '<div class="note">Все деньги здесь игровые. Не вводите настоящие пароли и данные карт.'+(local?' Файл сохранён на устройство: данные хранятся только тут, для перевода деньгами со вторым человеком открывайте ссылку из Claude.':'')+'</div></div></div>';
+    app.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{ mode=b.dataset.m; showAuth(); });
+    $('#go').onclick=doAuth;
+    const fb=$('#fpin'); if(fb) fb.onclick=fpLogin;
+  }
+  async function doAuth(){
+    const err=$('#err'), btn=$('#go'); err.textContent='';
+    const login=$('#lg').value.trim().toLowerCase(), pw=$('#pw').value, name=mode==='reg'?$('#nm').value.trim():'';
+    if(mode==='reg'&&!name){ err.textContent='Введите имя'; return; }
+    if(!/^[a-z0-9_-]{3,20}$/.test(login)){ err.textContent='Логин: 3\u201320 символов, латиница, цифры, _ и -'; return; }
+    if(pw.length<4){ err.textContent='Пароль: минимум 4 символа'; return; }
+    btn.disabled=true;
+    try{
+      const ref=db.doc('users/'+login), ph=await hash(login+':'+pw);
+      if(mode==='reg'){
+        const a=await ref.acquire({holder:tab,ttlMs:5000});
+        if(!a.acquired){ err.textContent='Попробуйте ещё раз через пару секунд'; btn.disabled=false; return; }
+        const s=await ref.get();
+        if(s.exists&&s.data()&&s.data().pinHash){ err.textContent='Такой логин уже занят'; btn.disabled=false; return; }
+        await ref.set({name,pinHash:ph,created:Date.now()});
+        users[login]={name};
+        toast('Добро пожаловать, '+name+'! Вам начислено 10 000 \u20BD');
+      }else{
+        const s=await ref.get(), d=s.exists&&s.data();
+        if(!d||d.pinHash!==ph){ err.textContent='Неверный логин или пароль'; btn.disabled=false; return; }
+        users[login]={name:d.name};
+      }
+      me=login; localStorage.setItem('igrobank-me',me); showApp('home');
+    }catch(e){
+      err.textContent=e&&e.code==='invalid_argument'?'Нет права на запись. Попросите владельца дать доступ на редактирование.':'Ошибка связи, попробуйте ещё раз';
+      btn.disabled=false;
+    }
+  }
+
+  /* ---------- app shell ---------- */
+  function showApp(v){
+    app.innerHTML='<div class="wrap"><div id="page"></div><div class="nav"><button data-v="home">Главная</button><button data-v="transfer">Перевод</button><button data-v="credit">Кредит</button><button data-v="history">История</button></div></div>';
+    app.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>go(b.dataset.v));
+    go(v);
+  }
+  function go(v){
+    view=v;
+    app.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
+    const p=$('#page');
+    if(v==='home'){
+      p.innerHTML='<div class="top"><div class="hi"><span>Здравствуйте, '+esc(nameOf(me))+'</span><button class="outb" id="out">Выйти</button></div></div>'+
+        '<div class="bank"><div class="lbl">Основной счёт</div><div class="bal" id="bal"></div><div class="num">Карта \u2022\u2022\u2022\u2022 '+tail(me)+'</div></div>'+
+        '<div class="actions"><button class="act" data-go="transfer"><i>\u2192</i>Перевести</button><button class="act" id="topup"><i>+</i>Пополнить</button><button class="act" data-go="history"><i>\u2261</i>История</button></div>'+
+        '<div class="sec" id="debtSec"></div><div class="sec"><h3>Расходы по категориям</h3><div id="stats"></div></div><div class="sec"><h3>Последние операции</h3><div id="recent"></div></div>'+
+        '<div class="sec" style="margin-top:8px"><button class="chip" id="fpb"></button></div>';
+      p.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
+      $('#out').onclick=()=>{ me=''; localStorage.removeItem('igrobank-me'); showAuth(); };
+      const fpb=$('#fpb'), fpLabel=()=>{ fpb.textContent=hasFp(me)?'Вход по отпечатку включён (нажмите, чтобы выключить)':'Включить вход по отпечатку'; };
+      fpLabel();
+      fpb.onclick=async()=>{
+        if(hasFp(me)){ localStorage.removeItem('igrobank-fp'); toast('Вход по отпечатку выключен'); }
+        else{ try{ await fpEnable(); toast('Вход по отпечатку включён'); }catch(e){ toast('Отпечаток недоступен на этом устройстве или в этом окне'); } }
+        fpLabel();
+      };
+      $('#topup').onclick=async e=>{
+        if(!canWrite){ toast('У вас только просмотр'); return; }
+        const b=e.currentTarget; b.disabled=true;
+        try{ await db.collection('tx').add({from:'bank',to:me,kop:100000,note:'Пополнение',ts:Date.now(),kind:'topup'}); toast('Зачислено 1 000,00 \u20BD'); }
+        catch(x){ toast('Не удалось пополнить'); }
+        b.disabled=false;
+      };
+    }else if(v==='transfer'){
+      p.innerHTML='<div class="sec"><h2>Перевод</h2><div class="form">'+
+        (canWrite?'':'<div class="err">У вас только просмотр: переводы недоступны</div>')+
+        '<label>Кому (логин)</label><input id="toLogin" autocapitalize="off" autocomplete="off" placeholder="логин получателя"><div class="hint" id="toName"></div><div class="chips" id="chips"></div>'+
+        '<label>Сумма, \u20BD</label><input id="amt" inputmode="decimal" placeholder="0,00">'+
+        '<label>Категория</label><select id="cat"><option>Подарок</option><option>Еда</option><option>Игры</option><option>Долг</option><option>Другое</option></select>'+
+        '<label>Сообщение получателю</label><input id="note" maxlength="60" placeholder="необязательно">'+
+        '<div class="err" id="err"></div><button class="btn" id="send">Перевести</button></div></div>';
+      $('#toLogin').oninput=hint; $('#send').onclick=send;
+      $('#chips').onclick=e=>{ const b=e.target.closest('.chip'); if(b){ $('#toLogin').value=b.dataset.l; hint(); } };
+    }else if(v==='credit'){
+      const d=debt(me);
+      if(d>0){
+        p.innerHTML='<div class="sec"><h2>Кредит</h2><div class="debt"><div class="lbl">Остаток долга</div><div class="v">'+fmt(d)+'</div>'+
+          '<label style="color:rgba(255,255,255,.85)">Сумма погашения, \u20BD</label><input id="rp" inputmode="decimal" placeholder="0,00">'+
+          '<button class="btn" id="rpMax" style="background:rgba(255,255,255,.25);margin-top:10px">Погасить всё сразу</button>'+
+          '<button class="btn" id="rpGo" style="background:#fff;color:#a83232">Погасить</button><div class="err" id="err" style="color:#ffe1e1"></div></div></div>';
+        $('#rpMax').onclick=()=>{ $('#rp').value=(d/100).toFixed(2).replace('.',','); };
+        $('#rpGo').onclick=()=>repay(d);
+      }else{
+        p.innerHTML='<div class="sec"><h2>Кредит</h2><div class="note" style="text-align:left;margin-top:4px">Оформляется мгновенно, переплата 10% сверху</div>'+
+          [5000,10000,25000,50000,100000].map(r=>'<div class="loffer"><div><b>'+fmt(r*100)+'</b><span>Вернуть '+fmt(Math.round(r*100*1.1))+'</span></div><button class="btn" style="width:auto;margin:0;padding:10px 18px" data-r="'+r+'">Взять</button></div>').join('')+
+          '<div class="err" id="err" style="margin-top:10px"></div></div>';
+        p.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>takeLoan(+b.dataset.r*100));
+      }
+    }else{
+      p.innerHTML='<div class="sec"><h2>История операций</h2><div id="hist" style="margin-top:12px"></div></div>';
+    }
+    refresh();
+  }
+  function rows(list){
+    if(!list.length) return '<div class="note">Операций пока нет</div>';
+    return list.map(t=>{
+      const out=t.from===me, other=out?t.to:t.from;
+      return '<div class="row"><div class="av" style="background:'+hue(other)+'">'+ini(other)+'</div><div class="t"><b>'+esc(nameOf(other))+'</b><span>'+esc([t.cat||(t.kind==='topup'?'Пополнение':'Перевод'),t.note].filter(Boolean).join(' \u00B7 '))+' \u00B7 '+when(t.ts)+'</span></div><div class="amt '+(out?'':'in')+'">'+(out?'\u2212':'+')+fmt(t.kop)+'</div></div>';
+    }).join('');
+  }
+  function refresh(){
+    if(!me) return;
+    const b=$('#bal'); if(b) b.textContent=fmt(bal(me));
+    const ds=$('#debtSec'); if(ds){ const d=debt(me); ds.innerHTML=d>0?'<div class="debt" style="padding:14px 16px;display:flex;justify-content:space-between;align-items:center"><div><div class="lbl">Долг по кредиту</div><div class="v" style="margin:2px 0 0;font-size:19px">'+fmt(d)+'</div></div><button class="btn" style="width:auto;margin:0;background:#fff;color:#a83232;padding:9px 16px" data-go="credit">Погасить</button></div>':''; const gb=ds.querySelector('[data-go]'); if(gb) gb.onclick=()=>go('credit'); }
+    const r=$('#recent'); if(r) r.innerHTML=rows(mine().slice(0,5));
+    const h=$('#hist'); if(h) h.innerHTML=rows(mine());
+    const st=$('#stats');
+    if(st){
+      const sp={};
+      mine().forEach(t=>{ if(t.from===me&&t.kind!=='topup'){ const c=t.cat||'Другое'; sp[c]=(sp[c]||0)+t.kop; } });
+      const ks=Object.keys(sp).sort((a,b)=>sp[b]-sp[a]), mx=Math.max(1,...ks.map(k=>sp[k]));
+      st.innerHTML=ks.length?ks.map(k=>'<div class="bar"><div class="bl"><span>'+esc(k)+'</span><b>'+fmt(sp[k])+'</b></div><div class="bt"><i style="width:'+Math.round(sp[k]/mx*100)+'%"></i></div></div>').join(''):'<div class="note">Пока нет расходов</div>';
+    }
+    const c=$('#chips');
+    if(c){
+      const others=Object.keys(users).filter(l=>l!==me);
+      c.innerHTML=others.length?others.map(l=>'<button class="chip" data-l="'+esc(l)+'">'+esc(users[l].name)+'</button>').join(''):'<span class="hint">Пока больше никто не зарегистрирован</span>';
+    }
+  }
+  function hint(){
+    const l=$('#toLogin').value.trim().toLowerCase();
+    $('#toName').textContent=l?(users[l]?'Получатель: '+users[l].name:'Такого логина нет'):'';
+  }
+  async function send(){
+    const err=$('#err'), btn=$('#send'); err.textContent='';
+    const to=$('#toLogin').value.trim().toLowerCase(), note=$('#note').value.trim();
+    const kop=Math.round(parseFloat($('#amt').value.replace(',','.'))*100);
+    if(!canWrite){ err.textContent='У вас только просмотр'; return; }
+    if(!users[to]){ err.textContent='Получатель не найден'; return; }
+    if(to===me){ err.textContent='Нельзя переводить самому себе'; return; }
+    if(!(kop>0)){ err.textContent='Введите сумму'; return; }
+    if(kop>bal(me)){ err.textContent='Недостаточно средств. Баланс: '+fmt(bal(me)); return; }
+    btn.disabled=true;
+    try{
+      await db.collection('tx').add({from:me,to,kop,note,cat:$('#cat').value,ts:Date.now(),kind:'transfer'});
+      done(kop,to);
+    }catch(e){
+      err.textContent=e&&e.code==='invalid_argument'?'Нет права на запись. Нужен доступ на редактирование.':'Не удалось выполнить перевод, попробуйте ещё раз';
+      btn.disabled=false;
+    }
+  }
+  async function takeLoan(kop){
+    if(!canWrite){ toast('У вас только просмотр'); return; }
+    try{ await db.collection('tx').add({from:'bank',to:me,kop,debtKop:Math.round(kop*1.1),ts:Date.now(),kind:'loan'}); toast('Кредит одобрен: '+fmt(kop)); go('home'); }
+    catch(e){ toast('Не удалось оформить кредит'); }
+  }
+  async function repay(maxKop){
+    const err=$('#err'); const kop=Math.round(parseFloat(($('#rp').value||'0').replace(',','.'))*100);
+    if(!(kop>0)){ err.textContent='Введите сумму'; return; }
+    const pay=Math.min(kop,maxKop);
+    if(pay>bal(me)){ err.textContent='Недостаточно средств на счёте'; return; }
+    try{ await db.collection('tx').add({from:me,to:'bank',kop:pay,ts:Date.now(),kind:'repay'}); toast('Погашено '+fmt(pay)); go('credit'); }
+    catch(e){ err.textContent='Не удалось выполнить погашение'; }
+  }
+  function done(kop,to){
+    const d=$('#done');
+    d.innerHTML='<div class="tick"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div><h2 style="margin:22px 0 6px">Перевод выполнен</h2><div style="font-size:30px;font-weight:800" id="dn">'+fmt(0)+'</div><div style="color:var(--mut);margin-top:8px">'+esc(nameOf(to))+'</div><button class="btn" style="max-width:320px" id="ok">Готово</button>';
+    d.className='done show'; ding();
+    const dn=$('#dn'), t0=performance.now();
+    (function step(n){ const p=Math.min(1,(n-t0)/700); dn.textContent=fmt(Math.round(kop*(1-Math.pow(1-p,3)))); if(p<1) requestAnimationFrame(step); })(t0);
+    $('#ok').onclick=()=>{ d.className='done'; go('home'); };
+  }
+
+  /* ---------- offline fallback (single device) ---------- */
+  let local=false;
+  function localDb(){
+    const K='igrobank-local'; let store={}, n=0;
+    try{ store=JSON.parse(localStorage.getItem(K)||'{}')||{}; }catch(e){}
+    const save=()=>{ try{ localStorage.setItem(K,JSON.stringify(store)); }catch(e){} };
+    const subs=[];
+    const items=(name,q)=>{
+      const a=Object.keys(store[name]||{}).map(id=>({id,v:store[name][id]}));
+      if(q.ob) a.sort((x,y)=>(x.v[q.ob]>y.v[q.ob])-(x.v[q.ob]<y.v[q.ob]));
+      return q.lim?a.slice(0,q.lim):a;
+    };
+    const wrap=d=>({id:d.id,data:()=>d.v});
+    const emit=s=>{
+      const a=items(s.name,s.q), fresh=s.seen?a.filter(d=>!s.seen.has(d.id)):a;
+      s.seen=new Set(a.map(d=>d.id));
+      s.cb({docs:a.map(wrap),docChanges:()=>fresh.map(d=>({type:'added',doc:wrap(d)})),metadata:{}});
+    };
+    const put=(name,id,v)=>{ (store[name]=store[name]||{})[id]=v; save(); subs.filter(s=>s.name===name).forEach(emit); };
+    const query=(name,q)=>({
+      orderBy:f=>query(name,Object.assign({},q,{ob:f})),
+      limit:k=>query(name,Object.assign({},q,{lim:k})),
+      onSnapshot(cb){ const s={name,q,seen:null,cb}; subs.push(s); setTimeout(()=>emit(s),0); return ()=>{ subs.splice(subs.indexOf(s),1); }; },
+      async add(v){ const id='l'+Date.now().toString(36)+(n++); put(name,id,v); return {id}; }
+    });
+    return {
+      collection:name=>query(name,{}),
+      doc:path=>{ const p=path.split('/'), name=p[0], id=p[1]; return {
+        async get(){ const v=(store[name]||{})[id]; return {exists:!!v,data:()=>v}; },
+        async set(v){ put(name,id,v); },
+        async acquire(){ return {acquired:true}; }
+      }; }
+    };
+  }
+
+  /* ---------- start ---------- */
+  function noDb(){}
+  app.innerHTML='<div class="wrap"><div class="hero"><div class="logo">И</div><h1 style="margin:0;font-size:24px">Игробанк</h1></div><div class="sheet"><div class="note" style="font-size:13px">Подключение к банку...</div></div></div>';
+  (async function(){
+    try{ if(window.claude&&claude.use){ db=await claude.use('db'); user=await claude.use('user'); } }catch(e){}
+    if(!db){ db=localDb(); local=true; }
+    const c=user&&user.can?user.can('data.write'):null;
+    canWrite=c!==false;
+    db.collection('users').onSnapshot(s=>{
+      users={};
+      s.docs.forEach(d=>{ const v=d.data(); if(v&&v.pinHash) users[d.id]={name:v.name||d.id}; });
+      if(first){ first=false; if(me&&users[me]&&!hasFp(me)) showApp('home'); else { me=''; showAuth(); } }
+      else if(me){ refresh(); }
+    },noDb);
+    db.collection('tx').orderBy('ts').limit(1000).onSnapshot(s=>{
+      txs=s.docs.map(d=>d.data()).filter(Boolean);
+      s.docChanges().forEach(ch=>{
+        if(ch.type!=='added') return;
+        const t=ch.doc.data();
+        if(t&&me&&t.to===me&&t.from!==me&&t.kind!=='topup'&&t.ts>openedAt){ ding(); toast('Вам перевели '+fmt(t.kop)+' от '+nameOf(t.from)); }
+      });
+      refresh();
+    },noDb);
+  })();
+})();
+</script>
+</body>
+</html>
